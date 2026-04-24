@@ -2,128 +2,96 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>碳水計算器</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>兒童糖友碳水計算機</title>
 
 <style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont;
-  background: #f4f6fb;
-  text-align: center;
-  padding: 20px;
-}
-
-h1 {
-  font-size: 24px;
-}
-
-.card {
-  background: white;
-  border-radius: 16px;
-  padding: 18px;
-  margin: 12px auto;
-  max-width: 420px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-input {
-  width: 85%;
-  padding: 12px;
-  margin: 8px;
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 12px;
-  margin: 6px;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  width: 45%;
-  background: #e8edff;
-}
-
-button:hover {
-  background: #d6ddff;
-}
-
-.result {
-  font-size: 20px;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.small {
-  font-size: 14px;
-  color: gray;
-}
-</style>
-</head>
-
-<body>
-
-<h1>🍪 吃了多少碳水？</h1>
-
-<div class="card">
-  <h3>① 看營養標示</h3>
-
-  <input id="carbServing" type="number" placeholder="每份碳水 (公克)">
-  <input id="servings" type="number" placeholder="本包裝幾份">
-
-  <div class="small">👉 只看「碳水化合物」，不用加糖</div>
-</div>
-
-<div class="card">
-  <h3>② 你吃了多少？</h3>
-
-  <button onclick="calculate(0.25)">1/4</button>
-  <button onclick="calculate(0.5)">1/2</button>
-  <button onclick="calculate(0.75)">3/4</button>
-  <button onclick="calculate(1)">1包</button>
-  <button onclick="calculate(1.5)">1.5包</button>
-  <button onclick="calculate(2)">2包</button>
-</div>
-
-<div class="card">
-  <h3>③ 結果</h3>
-
-  <div class="result" id="carbResult">碳水：0 g</div>
-  <div class="result" id="exchangeResult">主食份數：0 份</div>
-  <div class="small" id="feedback"></div>
-</div>
-
-<script>
-function calculate(portion){
-
-  let carbServing = parseFloat(document.getElementById("carbServing").value);
-  let servings = parseFloat(document.getElementById("servings").value);
-
-  if(isNaN(carbServing) || isNaN(servings)){
-    alert("請先輸入數值");
-    return;
+  :root {
+    --primary-blue: #4A90E2;
+    --bg-soft: #F4F7F9;
+    --text-dark: #2D3436;
   }
 
-  let totalCarb = carbServing * servings;
-  let actualCarb = totalCarb * portion;
-  let exchange = actualCarb / 15;
+  body {
+    font-family: -apple-system, "Noto Sans TC", sans-serif;
+    background-color: var(--bg-soft);
+    color: var(--text-dark);
+    margin: 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-  document.getElementById("carbResult").innerText =
-    "碳水：" + actualCarb.toFixed(0) + " g";
+  .container {
+    width: 100%;
+    max-width: 400px;
+  }
 
-  document.getElementById("exchangeResult").innerText =
-    "主食份數：" + exchange.toFixed(1);
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    color: var(--primary-blue);
+    margin: 15px 0;
+  }
 
-  let feedback = "";
-  if(exchange < 1) feedback = "👍 1份內 OK";
-  else if(exchange < 3) feedback = "👌 建議增加活動量";
-  else feedback = "⚠ 碳水偏多";
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
 
-  document.getElementById("feedback").innerText = feedback;
-}
-</script>
+  .section-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #636e72;
+    margin-bottom: 10px;
+  }
 
-</body>
-</html>
+  input {
+    width: 100%;
+    padding: 14px;
+    margin: 6px 0;
+    font-size: 18px;
+    border: 2px solid #EDF2F7;
+    border-radius: 12px;
+    box-sizing: border-box;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus { border-color: var(--primary-blue); }
+
+  .grid-btn {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  button.portion-btn {
+    padding: 14px 5px;
+    border: none;
+    border-radius: 12px;
+    background: #E8F0FE;
+    color: var(--primary-blue);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button.portion-btn:active {
+    background: var(--primary-blue);
+    color: white;
+  }
+
+  .result-box {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    color: white;
+    text-align: center;
+    padding: 25px;
+    border-radius: 20px;
+    margin-top: 10px;
+    box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3
