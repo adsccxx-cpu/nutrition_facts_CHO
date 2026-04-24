@@ -1,11 +1,10 @@
-# nutrition_facts_CHO
 
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>兒童碳水計算器</title>
+<title>碳水計算器</title>
 
 <style>
 body {
@@ -64,26 +63,16 @@ button {
 
 <body>
 
-<h1>🍪 吃了多少？</h1>
+<h1>🍪 吃了多少碳水？</h1>
 
 <div class="card">
-  <h3>家長設定</h3>
+  <h3>請閲讀食物包裝上的「營養標示」方框</h3>
 
-  <label>👉 模式：</label><br>
-  <select id="mode" onchange="toggleMode()">
-    <option value="package">整包輸入（推薦）</option>
-    <option value="serving">每份輸入</option>
-  </select>
-
-  <div id="packageMode">
-    <input id="carbPackage" type="number" placeholder="每包碳水 (g)">
-    <input id="kcalPackage" type="number" placeholder="每包熱量 (kcal)">
-  </div>
+  <label>👉 只需輸入營養標示方框中「碳水化合物」公克數，不需加上「糖」公克數</label><br>
 
   <div id="servingMode" style="display:none;">
-    <input id="carbServing" type="number" placeholder="每份碳水 (g)">
-    <input id="kcalServing" type="number" placeholder="每份熱量 (kcal)">
-    <input id="servings" type="number" placeholder="每包幾份">
+    <input id="carbServing" type="number" placeholder="每份碳水化合物 (公克)">
+    <input id="servings" type="number" placeholder="本包裝含幾份">
   </div>
 </div>
 
@@ -93,16 +82,17 @@ button {
   <button class="portion-btn" onclick="calculate(0.25)">🟡 一點點 （1/4） </button>
   <button class="portion-btn" onclick="calculate(0.5)">🟢 一半 （1/2） </button>
   <button class="portion-btn" onclick="calculate(0.75)">🔵 大部分（3/4）</button>
-  <button class="portion-btn" onclick="calculate(1)">🟣 一包</button>
-  <button class="portion-btn" onclick="calculate(1.5)">🔴 多吃/1.5包（瓶）</button>
-  <button class="portion-btn" onclick="calculate(2)">🔥 兩包（瓶）</button>
+  <button class="portion-btn" onclick="calculate(1)">🟣 整個吃完</button>
+  <button class="portion-btn" onclick="calculate(1.5)">🔴 吃了1.5包（1又1/2）</button>
+  <button class="portion-btn" onclick="calculate(2)">🔥 吃了2包 </button>
+    <button class="portion-btn" onclick="calculate(3)">🔥 吃了3包 </button>
+      <button class="portion-btn" onclick="calculate(4)">🔥 吃了4包 </button>
 </div>
 
 <div class="card">
   <h3>結果</h3>
-  <div class="result" id="carbResult">碳水：0 g</div>
-  <div class="result" id="kcalResult">熱量：0 kcal</div>
-  <div class="result" id="exchangeResult">碳水份數：0</div>
+  <div class="result" id="carbResult">總共吃了碳水化合物：0 公克</div>
+  <div class="result" id="exchangeResult">換算成主食份數：0 份</div>
   <div class="small" id="feedback"></div>
 </div>
 
@@ -145,18 +135,15 @@ function calculate(portion){
   let exchange = actualCarb / 15;
 
   document.getElementById("carbResult").innerText =
-    "碳水：" + actualCarb.toFixed(1) + " g";
-
-  document.getElementById("kcalResult").innerText =
-    "熱量：" + actualKcal.toFixed(0) + " kcal";
+    "碳水化合物：" + actualCarb.toFixed(1) + " 公克";
 
   document.getElementById("exchangeResult").innerText =
     "碳水份數：" + exchange.toFixed(1);
 
   let feedback = "";
-  if(exchange < 1) feedback = "👍 吃得不多";
-  else if(exchange < 3) feedback = "👌 還可以";
-  else feedback = "⚠ 有點多喔";
+  if(exchange < 1) feedback = "👍 一份主食，剛剛好";
+  else if(exchange < 3) feedback = "👌 2～3份主食，可以增加半小時運動消耗";
+  else feedback = "⚠ 超過3份主食（八分滿飯），當作點心的話有點多喔";
 
   document.getElementById("feedback").innerText = feedback;
 }
