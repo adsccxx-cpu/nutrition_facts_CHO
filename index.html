@@ -3,235 +3,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>糖友碳水計數器</title>
+<title>糖友碳水加總小幫手</title>
 
 <style>
   :root {
     --primary: #4A90E2;
-    --bg: #F8FAFC;
+    --bg: #F2F6F9;
     --card: #FFFFFF;
-    --text: #1A202C;
-    --dark-btn: #2D3436;
+    --text: #2D3436;
+    --accent: #FF7675;
   }
 
   body {
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, "Noto Sans TC", sans-serif;
     background-color: var(--bg);
     color: var(--text);
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .wrapper {
-    width: 100%;
-    max-width: 400px;
-  }
+  .wrapper { width: 100%; max-width: 400px; }
 
-  h1 {
-    font-size: 24px;
-    color: var(--primary);
-    text-align: center;
-    margin-bottom: 20px;
-  }
+  h1 { font-size: 22px; color: var(--primary); text-align: center; margin: 10px 0; }
 
   .card {
     background: var(--card);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    box-sizing: border-box;
-  }
-
-  label {
-    display: block;
-    font-size: 14px;
-    color: #718096;
-    margin-bottom: 8px;
-    font-weight: bold;
-  }
-
-  input {
-    width: 100%;
+    border-radius: 18px;
     padding: 15px;
-    margin-bottom: 15px;
-    font-size: 18px;
-    border: 2px solid #E2E8F0;
-    border-radius: 12px;
-    box-sizing: border-box;
-    outline: none;
-    background: #FDFDFD;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   }
 
-  input:focus {
+  label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #636E72; }
+
+  /* 搜尋區與分類按鈕 */
+  #foodSearch {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  .category-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .tab.active {
+    background: var(--primary);
+    color: white;
     border-color: var(--primary);
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+  .food-list {
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid #EDF2F7;
+    border-radius: 10px;
+    background: #FAFBFC;
   }
 
-  button.btn {
-    padding: 15px 5px;
-    border: none;
-    border-radius: 12px;
-    background: #EBF8FF;
-    color: var(--primary);
-    font-size: 16px;
-    font-weight: bold;
+  .food-item {
+    padding: 12px;
+    border-bottom: 1px solid #EDF2F7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
     cursor: pointer;
-    transition: all 0.2s;
   }
 
-  button.btn:active {
+  /* 選取區 */
+  .input-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  input[type="number"] {
+    width: 70px;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .add-btn {
+    flex: 1;
     background: var(--primary);
     color: white;
-    transform: scale(0.95);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
   }
 
-  /* 結果區域 */
-  .result-card {
-    display: none;
-    background: linear-gradient(135deg, #4A90E2 0%, #3182CE 100%);
+  /* 清單區 */
+  .calc-list {
+    margin-top: 10px;
+    border-top: 1px dashed #CBD5E0;
+    padding-top: 10px;
+  }
+  .list-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 5px;
+    background: #F8F9FA;
+    padding: 8px;
+    border-radius: 6px;
+  }
+  .del-btn { color: var(--accent); font-weight: bold; margin-left: 10px; cursor: pointer; }
+
+  /* 總結區域 */
+  .total-box {
+    background: linear-gradient(135deg, #4A90E2, #3182CE);
     color: white;
     text-align: center;
-    padding: 25px;
+    padding: 20px;
     border-radius: 20px;
     margin-top: 10px;
-    box-shadow: 0 10px 20px rgba(66, 153, 225, 0.3);
+  }
+  .total-val { font-size: 56px; font-weight: 900; margin: 5px 0; }
+  .copy-btn {
+    background: white; color: var(--primary); border: none;
+    padding: 12px; border-radius: 25px; width: 100%; font-weight: bold; margin-top: 10px;
   }
 
-  .result-title { font-size: 16px; opacity: 0.9; margin-bottom: 10px; }
-  
-  .result-val {
-    font-size: 64px;
-    font-weight: 900;
-    margin: 0;
-  }
-
-  .result-unit { font-size: 24px; font-weight: normal; margin-left: 5px; }
-
-  .copy-button {
-    background: white;
-    color: var(--primary);
-    border: none;
-    padding: 12px 25px;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 20px;
-    cursor: pointer;
-    width: 100%;
-  }
-
-  /* 外部連結按鈕 */
-  .link-button {
-    display: block;
-    background: var(--dark-btn);
-    color: white;
-    text-decoration: none;
-    text-align: center;
-    padding: 15px;
-    border-radius: 15px;
-    font-size: 16px;
-    font-weight: bold;
-    margin-top: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-
-  .link-button:active {
-    opacity: 0.9;
-    transform: scale(0.98);
-  }
-
-  .footer-tip {
-    text-align: center;
-    font-size: 13px;
-    color: #A0AEC0;
-    margin-top: 15px;
-    line-height: 1.5;
+  .link-btn {
+    display: block; background: #2D3436; color: white;
+    text-decoration: none; text-align: center; padding: 16px;
+    border-radius: 15px; font-weight: bold; margin-top: 12px;
   }
 </style>
 </head>
 <body>
 
 <div class="wrapper">
-  <h1>🍪 碳水計數器</h1>
+  <h1>🍪 碳水加總計數器</h1>
 
   <div class="card">
-    <label>1. 輸入包裝標示</label>
-    <input id="carbPerServing" type="number" inputmode="numeric" placeholder="每份碳水 (公克)">
-    <input id="totalServings" type="number" inputmode="numeric" placeholder="總共幾份">
-  </div>
-
-  <div class="card">
-    <label>2. 你吃了多少？</label>
-    <div class="grid">
-      <button class="btn" onclick="run(0.25)">1/4</button>
-      <button class="btn" onclick="run(0.5)">1/2</button>
-      <button class="btn" onclick="run(0.75)">3/4</button>
-      <button class="btn" onclick="run(1)">1 包</button>
-      <button class="btn" onclick="run(1.5)">1.5 包</button>
-      <button class="btn" onclick="run(2)">2 包</button>
+    <label>1. 搜尋與分類</label>
+    <div class="category-tabs">
+      <div class="tab active" onclick="setCat('all', this)">全部</div>
+      <div class="tab" onclick="setCat('snack', this)">中式早點</div>
+      <div class="tab" onclick="setCat('main', this)">常用主食</div>
+      <div class="tab" onclick="setCat('drink', this)">各式飲料</div>
+    </div>
+    <input type="text" id="foodSearch" placeholder="搜尋關鍵字..." oninput="renderList()">
+    <div class="food-list" id="foodList"></div>
+    
+    <div class="input-row">
+      <div style="font-size: 13px; color: #718096;">已選：<span id="selectedName">未選取</span></div>
+    </div>
+    <div class="input-row">
+      <input id="baseCarb" type="number" placeholder="g">
+      <div style="font-size: 14px;">×</div>
+      <input id="portion" type="number" value="1" step="0.25">
+      <div style="font-size: 14px;">份</div>
+      <button class="add-btn" onclick="addToList()">➕ 加入清單</button>
     </div>
   </div>
 
-  <div id="resBox" class="result-card">
-    <div class="result-title">你要打的碳水克數</div>
-    <div class="result-val"><span id="finalCarb">0</span><span class="result-unit">g</span></div>
-    <button class="copy-button" id="copyBtn" onclick="doCopy()">📋 複製克數</button>
+  <div class="card">
+    <label>2. 本餐清單</label>
+    <div id="displayList" class="calc-list">
+      <div style="color: #A0AEC0; font-size: 13px; text-align: center;">清單是空的</div>
+    </div>
   </div>
 
-  <a href="https://adsccxx-cpu.github.io/insulin-calculator/" class="link-button">
-    🚀 前往計算胰島素劑量
-  </a>
+  <div class="total-box">
+    <div style="font-size:14px; opacity:0.9">總和 (整數)</div>
+    <div class="total-val"><span id="grandTotal">0</span><span style="font-size:24px">g</span></div>
+    <button class="copy-btn" id="cpBtn" onclick="copyTotal()">📋 複製數字</button>
+  </div>
 
-  <p class="footer-tip">
-    步驟：輸入數值 → 選擇分量 → 點擊複製<br>
-    最後再點按鈕去計算胰島素
-  </p>
+  <a href="https://adsccxx-cpu.github.io/insulin-calculator/" class="link-btn">🚀 前往計算胰島素</a>
 </div>
 
 <script>
-let savedValue = 0;
+const foodDB = [
+  // 中式早點 (snack)
+  {n: "飯糰 (1丸/正常)", c: 60, cat: "snack"},
+  {n: "水煎包 (1顆/肉)", c: 15, cat: "snack"},
+  {n: "水煎包 (1顆/菜)", c: 20, cat: "snack"},
+  {n: "蔥油餅 (1/4張)", c: 15, cat: "snack"},
+  {n: "蔥油餅 (1張)", c: 60, cat: "snack"},
+  {n: "蔥抓餅 (1張)", c: 45, cat: "snack"},
+  {n: "蛋餅 (1份)", c: 20, cat: "snack"},
+  {n: "燒餅 (1條)", c: 30, cat: "snack"},
+  {n: "油條 (1根)", c: 15, cat: "snack"},
+  {n: "饅頭 (1顆/中)", c: 30, cat: "snack"},
+  {n: "刈包 (1份/不含肉)", c: 30, cat: "snack"},
+  {n: "肉包 (1顆)", c: 45, cat: "snack"},
+  {n: "紅豆餅/車輪餅 (1顆)", c: 20, cat: "snack"},
+  {n: "小籠包 (1顆/中型)", c: 8, cat: "snack"},
+  {n: "小籠湯包 (1顆/大型)", c: 10, cat: "snack"},
+  {n: "蘿蔔糕 (2片)", c: 30, cat: "snack"},
+  
+  // 常用主食 (main)
+  {n: "白飯 (1碗)", c: 60, cat: "main"},
+  {n: "白飯 (1/2碗)", c: 30, cat: "main"},
+  {n: "吐司 (1片)", c: 15, cat: "main"},
+  {n: "陽春麵 (1碗)", c: 30, cat: "main"},
+  {n: "義大利麵 (1碗)", c: 45, cat: "main"},
+  {n: "燕麥片 (3湯匙)", c: 15, cat: "main"},
 
-function run(ratio) {
-  const carb = document.getElementById('carbPerServing').value;
-  const count = document.getElementById('totalServings').value;
+  // 飲料 (drink)
+  {n: "珍珠奶茶 (700ml/全糖)", c: 60, cat: "drink"},
+  {n: "珍珠奶茶 (700ml/半糖)", c: 45, cat: "drink"},
+  {n: "豆漿 (400ml/有糖)", c: 15, cat: "drink"},
+  {n: "米漿 (400ml)", c: 40, cat: "drink"},
+  {n: "可樂 (330ml/罐)", c: 35, cat: "drink"},
+  {n: "多多綠 (700ml/全糖)", c: 70, cat: "drink"},
+  {n: "鮮奶 (240ml)", c: 12, cat: "drink"},
+  {n: "柳橙汁 (240ml)", c: 25, cat: "drink"}
+];
 
-  if (!carb || !count) {
-    alert("請先輸入碳水克數跟份數喔！");
+let currentCat = 'all';
+let currentList = [];
+let selectedFood = { n: '', c: 0 };
+
+function setCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const kw = document.getElementById('foodSearch').value.toLowerCase();
+  const list = document.getElementById('foodList');
+  list.innerHTML = '';
+  
+  const filtered = foodDB.filter(f => {
+    const matchKw = f.n.includes(kw);
+    const matchCat = (currentCat === 'all' || f.cat === currentCat);
+    return matchKw && matchCat;
+  });
+
+  filtered.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'food-item';
+    div.innerHTML = `<span>${f.n}</span><span style="color:#4A90E2">${f.c}g</span>`;
+    div.onclick = () => {
+      selectedFood = f;
+      document.getElementById('selectedName').innerText = f.n;
+      document.getElementById('baseCarb').value = f.c;
+      document.getElementById('portion').value = 1;
+    };
+    list.appendChild(div);
+  });
+}
+
+function addToList() {
+  const c = parseFloat(document.getElementById('baseCarb').value);
+  const p = parseFloat(document.getElementById('portion').value);
+  if(!c) return alert("請先選取食物");
+
+  const name = selectedFood.n || "自定義";
+  currentList.push({ name: name, carb: c * p });
+  updateUI();
+  
+  // 重置選取
+  document.getElementById('baseCarb').value = '';
+  document.getElementById('selectedName').innerText = '未選取';
+  selectedFood = { n: '', c: 0 };
+}
+
+function updateUI() {
+  const listDiv = document.getElementById('displayList');
+  const totalSpan = document.getElementById('grandTotal');
+  
+  if(currentList.length === 0) {
+    listDiv.innerHTML = '<div style="color: #A0AEC0; font-size: 13px; text-align: center;">清單是空的</div>';
+    totalSpan.innerText = '0';
     return;
   }
 
-  // 四捨五入至整數
-  savedValue = Math.round(parseFloat(carb) * parseFloat(count) * ratio);
-
-  // 顯示結果並填入數值
-  document.getElementById('resBox').style.display = 'block';
-  document.getElementById('finalCarb').innerText = savedValue;
-
-  // 自動捲動到結果處
-  document.getElementById('resBox').scrollIntoView({ behavior: 'smooth' });
+  let total = 0;
+  listDiv.innerHTML = '';
+  currentList.forEach((item, index) => {
+    total += item.carb;
+    const div = document.createElement('div');
+    div.className = 'list-item';
+    div.innerHTML = `<span>${item.name} (${Math.round(item.carb)}g)</span>
+                     <span class="del-btn" onclick="removeItem(${index})">✕</span>`;
+    listDiv.appendChild(div);
+  });
+  totalSpan.innerText = Math.round(total);
 }
 
-function doCopy() {
-  const textToCopy = savedValue.toString();
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.innerText = "✅ 已複製！可去計算劑量了";
-    setTimeout(() => {
-      btn.innerText = "📋 複製克數";
-    }, 2000);
-  }).catch(err => {
-    alert("複製失敗，請手動記下數字：" + textToCopy);
+function removeItem(index) {
+  currentList.splice(index, 1);
+  updateUI();
+}
+
+function copyTotal() {
+  const val = document.getElementById('grandTotal').innerText;
+  navigator.clipboard.writeText(val).then(() => {
+    document.getElementById('cpBtn').innerText = "✅ 已複製！";
+    setTimeout(() => { document.getElementById('cpBtn').innerText = "📋 複製數字"; }, 1500);
   });
 }
+
+renderList(); // 初始載入
 </script>
 
 </body>
