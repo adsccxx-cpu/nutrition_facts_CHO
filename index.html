@@ -3,95 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>兒童糖友碳水計算機</title>
+<title>糖友碳水計數器</title>
 
 <style>
   :root {
-    --primary-blue: #4A90E2;
-    --bg-soft: #F4F7F9;
-    --text-dark: #2D3436;
+    --primary: #4A90E2;
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+    --text: #1A202C;
+    --dark-btn: #2D3436;
   }
 
   body {
-    font-family: -apple-system, "Noto Sans TC", sans-serif;
-    background-color: var(--bg-soft);
-    color: var(--text-dark);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
     margin: 0;
-    padding: 15px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .container {
+  .wrapper {
     width: 100%;
     max-width: 400px;
   }
 
   h1 {
-    font-size: 22px;
+    font-size: 24px;
+    color: var(--primary);
     text-align: center;
-    color: var(--primary-blue);
-    margin: 15px 0;
+    margin-bottom: 20px;
   }
 
   .card {
-    background: white;
-    border-radius: 16px;
+    background: var(--card);
+    border-radius: 20px;
     padding: 20px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-sizing: border-box;
   }
 
-  .section-title {
-    font-size: 15px;
+  label {
+    display: block;
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 8px;
     font-weight: bold;
-    color: #636e72;
-    margin-bottom: 10px;
   }
 
   input {
     width: 100%;
-    padding: 14px;
-    margin: 6px 0;
+    padding: 15px;
+    margin-bottom: 15px;
     font-size: 18px;
-    border: 2px solid #EDF2F7;
+    border: 2px solid #E2E8F0;
     border-radius: 12px;
     box-sizing: border-box;
     outline: none;
-    -webkit-appearance: none;
+    background: #FDFDFD;
   }
 
-  input:focus { border-color: var(--primary-blue); }
+  input:focus {
+    border-color: var(--primary);
+  }
 
-  .grid-btn {
+  .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-top: 5px;
   }
 
-  button.portion-btn {
-    padding: 14px 5px;
+  button.btn {
+    padding: 15px 5px;
     border: none;
     border-radius: 12px;
-    background: #E8F0FE;
-    color: var(--primary-blue);
+    background: #EBF8FF;
+    color: var(--primary);
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    transition: all 0.2s;
   }
 
-  button.portion-btn:active {
-    background: var(--primary-blue);
+  button.btn:active {
+    background: var(--primary);
     color: white;
+    transform: scale(0.95);
   }
 
-  .result-box {
-    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+  /* 結果區域 */
+  .result-card {
+    display: none;
+    background: linear-gradient(135deg, #4A90E2 0%, #3182CE 100%);
     color: white;
     text-align: center;
     padding: 25px;
     border-radius: 20px;
     margin-top: 10px;
-    box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3
+    box-shadow: 0 10px 20px rgba(66, 153, 225, 0.3);
+  }
+
+  .result-title { font-size: 16px; opacity: 0.9; margin-bottom: 10px; }
+  
+  .result-val {
+    font-size: 64px;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  .result-unit { font-size: 24px; font-weight: normal; margin-left: 5px; }
+
+  .copy-button {
+    background: white;
+    color: var(--primary);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  /* 外部連結按鈕 */
+  .link-button {
+    display: block;
+    background: var(--dark-btn);
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    padding: 15px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .link-button:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  .footer-tip {
+    text-align: center;
+    font-size: 13px;
+    color: #A0AEC0;
+    margin-top: 15px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <h1>🍪 碳水計數器</h1>
+
+  <div class="card">
+    <label>1. 輸入包裝標示</label>
+    <input id="carbPerServing" type="number" inputmode="numeric" placeholder="每份碳水 (公克)">
+    <input id="totalServings" type="number" inputmode="numeric" placeholder="總共幾份">
+  </div>
+
+  <div class="card">
+    <label>2. 你吃了多少？</label>
+    <div class="grid">
+      <button class="btn" onclick="run(0.25)">1/4</button>
+      <button class="btn" onclick="run(0.5)">1/2</button>
+      <button class="btn" onclick="run(0.75)">3/4</button>
+      <button class="btn" onclick="run(1)">1 包</button>
+      <button class="btn" onclick="run(1.5)">1.5 包</button>
+      <button class="btn" onclick="run(2)">2 包</button>
+    </div>
+  </div>
+
+  <div id="resBox" class="result-card">
+    <div class="result-title">你要打的碳水克數</div>
+    <div class="result-val"><span id="finalCarb">0</span><span class="result-unit">g</span></div>
+    <button class="copy-button" id="copyBtn" onclick="doCopy()">📋 複製克數</button>
+  </div>
+
+  <a href="https://adsccxx-cpu.github.io/insulin-calculator/" class="link-button">
+    🚀 前往計算胰島素劑量
+  </a>
+
+  <p class="footer-tip">
+    步驟：輸入數值 → 選擇分量 → 點擊複製<br>
+    最後再點按鈕去計算胰島素
+  </p>
+</div>
+
+<script>
+let savedValue = 0;
+
+function run(ratio) {
+  const carb = document.getElementById('carbPerServing').value;
+  const count = document.getElementById('totalServings').value;
+
+  if (!carb || !count) {
+    alert("請先輸入碳水克數跟份數喔！");
+    return;
+  }
+
+  // 四捨五入至整數
+  savedValue = Math.round(parseFloat(carb) * parseFloat(count) * ratio);
+
+  // 顯示結果並填入數值
+  document.getElementById('resBox').style.display = 'block';
+  document.getElementById('finalCarb').innerText = savedValue;
+
+  // 自動捲動到結果處
+  document.getElementById('resBox').scrollIntoView({ behavior: 'smooth' });
+}
+
+function doCopy() {
+  const textToCopy = savedValue.toString();
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.innerText = "✅ 已複製！可去計算劑量了";
+    setTimeout(() => {
+      btn.innerText = "📋 複製克數";
+    }, 2000);
+  }).catch(err => {
+    alert("複製失敗，請手動記下數字：" + textToCopy);
+  });
+}
+</script>
+
+</body>
+</html>
